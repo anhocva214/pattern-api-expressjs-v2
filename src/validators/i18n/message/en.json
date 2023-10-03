@@ -1,0 +1,6 @@
+{
+	"required": ":fieldname cannot be empty",
+	"exists": ":fieldname is exists",
+	"invalid": "Invalid :fieldname",
+	"numeric": ":fieldname must be numeric"
+}

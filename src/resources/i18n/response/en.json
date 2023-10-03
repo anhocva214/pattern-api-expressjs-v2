@@ -1,0 +1,11 @@
+{
+    "register_successfully": "Register successfully",
+    "login_successfully": "Login successfully",
+    "login_failure": "Login failure",
+    "logout_successfully":"Logout successfully",
+    "update_successfully":"Update successfully",
+    "invalid_authentication_code": "Invalid authentication code",
+    "create_successfully": "Create successfully",
+    "remove_successfully": "Remove successfully",
+    "account_locked": "Account locked"
+}

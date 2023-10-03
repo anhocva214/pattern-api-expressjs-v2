@@ -1,0 +1,15 @@
+{
+	"register_successfully": "Đăng ký thành công",
+	"login_successfully": "Đăng nhập thành công",
+	"login_failure": "Đăng nhập thất bại",
+	"logout_successfully": "Đăng xuất thành công",
+	"update_successfully": "Cập nhật thành công",
+	"invalid_authentication_code": "Mã xác thực không hợp lệ",
+	"create_successfully": "Tạo thành công",
+	"remove_successfully": "Loại bỏ thành công",
+	"account_locked": "Tài khoản đã bị khoá",
+	"Invalid captcha": "Invalid captcha",
+	"Bạn cần xác thực captcha": "Bạn cần xác thực captcha",
+	"Bạn cần xác thực OTP": "Bạn cần xác thực OTP",
+	"Mã xác thực không hợp lệ": "Mã xác thực không hợp lệ"
+}
