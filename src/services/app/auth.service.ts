@@ -1,10 +1,10 @@
 import { AppError } from "@models/error";
 import { User, UserModel } from "@models/user.model";
-import OtpService from "./otp.service";
+import OtpService from "../otp.service";
 import bcrypt from "bcrypt";
 import { StatusCodes } from "http-status-codes";
 import { Token, TokenModel } from "@models/token.model";
-import JwtService from "./jwt.service";
+import JwtService from "../jwt.service";
 import moment from "moment";
 import slugify from "@helpers/function.helper";
 

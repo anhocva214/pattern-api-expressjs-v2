@@ -1,16 +1,12 @@
 import { ITokenPayloadCaptcha, Token, TokenModel } from "@models/token.model";
-import { User, UserModel } from "@models/user.model";
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
-import bcrypt from "bcrypt";
-import JwtService from "@services/jwt.service";
 import { AppError } from "@models/error";
 import moment from "moment";
 import { v1 as uuidV1 } from "uuid";
 import OtpService from "@services/otp.service";
 import normalizeEmail from "normalize-email";
-import slugify from "@helpers/function.helper";
-import AuthService from "@services/auth.service";
+import AuthService from "@services/app/auth.service";
 
 // @ts-ignore
 const SliderCaptcha = require("@slider-captcha/core");

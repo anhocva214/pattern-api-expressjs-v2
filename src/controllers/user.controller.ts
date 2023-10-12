@@ -1,25 +1,26 @@
 import StatusCodes from "http-status-codes";
 import { NextFunction, Request, Response } from "express";
-const { FORBIDDEN, CREATED, OK, BAD_GATEWAY, BAD_REQUEST } = StatusCodes;
 import { User, UserModel } from "@models/user.model";
 import { Token, TokenModel } from "@models/token.model";
 import bcrypt from "bcrypt";
 import JwtService from "@services/jwt.service";
-import { AppError } from "@models/error";
 import moment from "moment";
-import { FilterQuery } from "mongoose";
 import MailService from "@services/mail.service";
 import otpGenerator from "otp-generator";
 import _ from "lodash";
 import slugify from "@helpers/function.helper";
+import { FileUpload } from "@models/upload.model";
+import UserService from "@services/app/user.service";
 
 export default class UserController {
   private jwtService: JwtService;
   private mailService: MailService;
+  private userService: UserService;
 
   constructor() {
     this.jwtService = new JwtService();
     this.mailService = new MailService();
+    this.userService = new UserService();
   }
 
   private generateOTPCode() {
@@ -66,51 +67,17 @@ export default class UserController {
   // update info
   async update(req: Request, res: Response) {
     let user = new User(req.user);
-    let {
+    let avatarFile = new FileUpload(req.file as any);
+    let { fullname, birthday } = req.body;
+
+    let data = await this.userService.update(user.id || "", {
+      avatarFile,
       fullname,
-      // email,
-      career,
-      phoneNumber,
-      password,
-      newPassword,
       birthday,
-      workUnit,
-      purposesUsing,
-    } = req.body;
+    });
 
-    if (password) {
-      if (!newPassword) {
-        return res.status(StatusCodes.BAD_REQUEST).send({
-          errors: { newPassword: ["Mật khẩu mới là thông tin cần thiết"] },
-        });
-      }
-      user = new User((await UserModel.findById(user.id))?.toObject());
-      if (!(await bcrypt.compare(password, user.password))) {
-        return res
-          .status(StatusCodes.FORBIDDEN)
-          .send({ errors: { password: ["Mật khẩu không đúng"] } });
-      }
-    }
+    return res.json(data)
 
-    await UserModel.updateOne(
-      { _id: user.id },
-      {
-        fullname,
-        // email,
-        career,
-        phoneNumber,
-        birthday,
-        workUnit,
-        updatedAt: new Date(),
-        purposesUsing,
-        ...(password
-          ? {
-              password: await bcrypt.hash(newPassword, await bcrypt.genSalt()),
-            }
-          : {}),
-      }
-    );
-    return res.json({});
   }
 
   // lock
@@ -224,7 +191,7 @@ export default class UserController {
       paginate: {
         page,
         limit,
-        totalPages: Math.ceil((dataTotal.length) / limit),
+        totalPages: Math.ceil(dataTotal.length / limit),
       },
     });
   }
@@ -236,7 +203,6 @@ export default class UserController {
       //   await UserModel.findById(userId).select("-password")
       // )?.toObject();
       // let sub = (await SubscriptionModel.findOne({ user: userId }))?.toObject();
-
       // return res.json({
       //   user,
       //   subscription: sub,
@@ -310,5 +276,4 @@ export default class UserController {
       next(err);
     }
   }
-
 }

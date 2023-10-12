@@ -13,6 +13,7 @@ export class User extends BaseModel {
   balance: number;
   locked: boolean;
   fullnameSlug?: string;
+  birthday: Date | null
 
   constructor(obj?: Partial<User>) {
     super(obj as any);
@@ -25,7 +26,19 @@ export class User extends BaseModel {
     this.balance = obj?.balance || 0;
     this.locked = obj?.locked || false;
     this.fullnameSlug = obj?.fullnameSlug || "";
+    this.birthday = obj?.birthday || null
   }
+
+  toDataResponse(): IUserResponse {
+    return {
+      ...this,
+      password: undefined
+    };
+  }
+}
+
+interface IUserResponse extends Omit<User, "password" | "preCreate" | "preUpdate" | "toDataResponse">{
+
 }
 
 const userSchema = new Schema({
@@ -40,6 +53,7 @@ const userSchema = new Schema({
   updatedAt: Date,
   locked: Boolean,
   fullnameSlug: String,
+  birthday: Date
 });
 
 userSchema.set("toObject", {
