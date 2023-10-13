@@ -58,3 +58,4 @@ export interface IWards {
   code: string;
   parent_code: string;
 }
+

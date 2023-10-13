@@ -39,5 +39,6 @@
 	"to": "to",
 	"tokenId": "tokenId",
 	"value": "Giá trị",
-	"phoneNumber": "phoneNumber"
+	"phoneNumber": "phoneNumber",
+	"service": "service"
 }

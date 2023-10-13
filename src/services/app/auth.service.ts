@@ -32,8 +32,10 @@ export default class AuthService {
     }
   }
 
-  async login(phoneNumber: string, password: string) {
-    let user = new User((await UserModel.findOne({ phoneNumber })) as any);
+  async login(phoneNumber: string, password: string, role: string) {
+    let user = new User(
+      (await UserModel.findOne({ phoneNumber, role })) as any
+    );
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new AppError({
         where: "login",
@@ -81,6 +83,7 @@ export default class AuthService {
     user.balance = 0;
     user.fullnameSlug = slugify(user.fullname);
     user.preCreate();
-    await UserModel.create(user);
+    let newUser = new User(await UserModel.create(user));
+    return { userId: newUser.id };
   }
 }

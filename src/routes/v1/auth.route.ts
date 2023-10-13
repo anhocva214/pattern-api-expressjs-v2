@@ -24,13 +24,12 @@ export default class AuthRouter extends BaseRouter {
     );
     this.router.post(
       this.path("/login"),
-      otpMiddleware,
       formValidate(this.validator.login()),
       this.controller.login.bind(this.controller)
     );
     this.router.post(
       this.path("/register"),
-      otpMiddleware,
+      otpMiddleware("register"),
       formValidate(this.validator.register()),
       this.controller.register.bind(this.controller)
     );

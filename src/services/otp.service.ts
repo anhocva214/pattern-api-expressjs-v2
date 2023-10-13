@@ -1,6 +1,7 @@
 import {
   ITokenPayloadOTP,
   TOtpMethod,
+  TOtpService,
   Token,
   TokenModel,
 } from "@models/token.model";
@@ -12,15 +13,21 @@ import { AppError } from "@models/error";
 import { StatusCodes } from "http-status-codes";
 
 export default class OtpService {
-  private expiresIn: number;
+  private otpCodeExpiresIn: number;
+  private otpTokenExpiresIn: number;
   private mailService: MailService;
 
   constructor() {
-    this.expiresIn = 15 * 60; // 15 minutes
+    this.otpCodeExpiresIn = 90; // 90 seconds
+    this.otpTokenExpiresIn = 5 * 60; // 5 minutes
     this.mailService = new MailService();
   }
 
-  async sendOTP(data: { to: string; method: TOtpMethod }) {
+  async sendOTP(data: {
+    to: string;
+    method: TOtpMethod;
+    service: TOtpService;
+  }) {
     let otpCode = OtpGenerator.generate(6, {
       digits: true,
       upperCaseAlphabets: false,
@@ -33,25 +40,25 @@ export default class OtpService {
         to: data.to,
         otpCode,
       });
-    }
-    else if (data.method == "sms"){
-      otpCode = "123456"
+    } else if (data.method == "sms") {
+      otpCode = "1234";
     }
 
+    let expiredAt = moment(new Date()).add(this.otpCodeExpiresIn, "seconds").toDate();
     let tokenObj = new Token<ITokenPayloadOTP>({
       data: {
         ...data,
         otpCode,
         id: uuidV1(),
       },
-      expiredAt: moment(new Date()).add(this.expiresIn, "seconds").toDate(),
+      expiredAt,
       type: "otp",
       payload: "",
     });
     tokenObj.preCreate();
     await TokenModel.create(tokenObj);
 
-    return { otpId: tokenObj?.data?.id };
+    return { otpId: tokenObj?.data?.id, expiredAt };
   }
 
   async verifyOTP(data: { otpId: string; otpCode: string }) {
@@ -75,9 +82,9 @@ export default class OtpService {
         let otpToken = uuidV1();
         await TokenModel.updateOne(
           { "data.id": data.otpId },
-          { payload: otpToken }
+          { payload: otpToken, expiredAt: this.otpTokenExpiresIn }
         );
-        return otpToken;
+        return { otpToken };
       }
     } else {
       throw new AppError({

@@ -1,5 +1,6 @@
 import { check, validationResult } from "express-validator";
 import { MESSAGE_TYPE } from "./i18n/type";
+import { LIST_OTP_SERVICES } from "@models/token.model";
 
 export default class AuthValidator {
   constructor() {}
@@ -12,6 +13,7 @@ export default class AuthValidator {
         .withMessage(MESSAGE_TYPE.required)
         .isIn(["user", "admin"])
         .withMessage(MESSAGE_TYPE.invalid),
+      check("phoneNumber").not().isEmpty().withMessage(MESSAGE_TYPE.required),
       check("password").not().isEmpty().withMessage(MESSAGE_TYPE.required),
     ];
   }
@@ -35,16 +37,18 @@ export default class AuthValidator {
 
   sendOTP() {
     return [
-      check("to")
-        .not()
-        .isEmpty()
-        .withMessage(MESSAGE_TYPE.required)
-        .trim(),
+      check("to").not().isEmpty().withMessage(MESSAGE_TYPE.required).trim(),
       check("method")
         .not()
         .isEmpty()
         .withMessage(MESSAGE_TYPE.required)
         .isIn(["email", "sms"])
+        .withMessage(MESSAGE_TYPE.invalid),
+      check("service")
+        .not()
+        .isEmpty()
+        .withMessage(MESSAGE_TYPE.required)
+        .isIn(LIST_OTP_SERVICES)
         .withMessage(MESSAGE_TYPE.invalid),
     ];
   }
@@ -57,6 +61,12 @@ export default class AuthValidator {
         .isEmpty()
         .withMessage(MESSAGE_TYPE.required)
         .trim(),
+      check("service")
+        .not()
+        .isEmpty()
+        .withMessage(MESSAGE_TYPE.required)
+        .isIn(LIST_OTP_SERVICES)
+        .withMessage(MESSAGE_TYPE.invalid),
     ];
   }
 }

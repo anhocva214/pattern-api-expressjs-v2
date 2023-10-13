@@ -2,6 +2,10 @@ import { Schema, Types, model } from "mongoose";
 import BaseModel from ".";
 
 export type TTokenType = "otp" | "access_token" | "reset_password_token" | "captcha"|"";
+
+export const LIST_OTP_SERVICES = ["register", "forgot_password"] as const
+export type TOtpService =  typeof LIST_OTP_SERVICES[number]
+
 export class Token<T> extends BaseModel {
   payload: string;
   expiredAt: Date | undefined;
@@ -28,6 +32,7 @@ export interface ITokenPayloadOTP{
   method: TOtpMethod
   otpCode: string
   id: string
+  service: TOtpService
 }
 
 

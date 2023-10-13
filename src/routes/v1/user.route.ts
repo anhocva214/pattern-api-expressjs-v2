@@ -5,7 +5,6 @@ import middleware from "@middleware/jwt.middleware";
 import rateLimit from "express-rate-limit";
 import BaseRouter from "../base.route";
 import { formValidate } from "@validators/index";
-import otpMiddleware from "@middleware/otp.middleware";
 
 const apiLimiter = rateLimit({
   windowMs: 2 * 60 * 1000, // 2 minutes

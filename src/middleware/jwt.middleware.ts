@@ -1,3 +1,4 @@
+import { AppError } from "@models/error";
 import { TAcPermission, TAcResource } from "@models/interface";
 import { TUserPermission } from "@models/role.model";
 import { TokenModel } from "@models/token.model";
@@ -6,6 +7,7 @@ import AccessControlService from "@services/access-control.service";
 import JwtService from "@services/jwt.service";
 import logger from "@services/logger.service";
 import { NextFunction, Request, Response } from "express";
+import { StatusCodes } from "http-status-codes";
 
 const jwtService = new JwtService();
 const accessControlService = new AccessControlService();
@@ -14,7 +16,7 @@ export default function middleware(permission?: TUserPermission) {
   return async (req: Request, res: Response, next: NextFunction) => {
     let authorization: string = req.headers.authorization as string;
     let accessToken = authorization?.split(" ")?.[1]?.trim();
-    let socialite = req.headers["socialite"];
+    // let socialite = req.headers["socialite"];
     let filterQueryUser: { [k: string]: string } = {};
 
     if (req.ignoreVerify) {
@@ -46,6 +48,13 @@ export default function middleware(permission?: TUserPermission) {
         return res.status(401).send({ message: "Người dùng đã bị xoá" });
       } else if (!!user?.locked) {
         return res.status(403).send({ message: "Tài khoản đã bị khoá" });
+      } else if (!user?.updatedInfo) {
+        throw new AppError({
+          message: "Người dùng chưa cập nhật thông tin lần đầu tiên",
+          statusCode: StatusCodes.BAD_REQUEST,
+          where: "middleware",
+          detail: "",
+        });
       }
 
       if (!!permission && !accessControlService.can(user.role, permission)) {

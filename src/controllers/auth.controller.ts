@@ -31,8 +31,8 @@ export default class AuthController {
     try {
       let { password } = req.body;
       let phoneNumber = req.otpTo || "";
-      await this.authService.register(phoneNumber, password);
-      res.json({});
+      let {userId} = await this.authService.register(phoneNumber, password);
+      res.json({userId});
     } catch (err) {
       console.log(err);
       next(err);
@@ -42,10 +42,8 @@ export default class AuthController {
   // Login
   async login(req: Request, res: Response, next: NextFunction) {
     try {
-      let { password } = req.body;
-      let phoneNumber = req.otpTo || "";
-
-      let data = await this.authService.login(phoneNumber, password);
+      let { password, phoneNumber, role } = req.body;
+      let data = await this.authService.login(phoneNumber, password, role);
       return res.json(data);
     } catch (err) {
       console.log(err);
@@ -57,6 +55,7 @@ export default class AuthController {
   async preLogin(req: Request, res: Response, next: NextFunction) {
     try {
       let phoneNumber = req.body.phoneNumber;
+      console.log("🚀 ~ file: auth.controller.ts:58 ~ AuthController ~ preLogin ~ phoneNumber:", phoneNumber)
       let { userId } = await this.authService.preLogin(phoneNumber);
       return res.json({ userId });
     } catch (err) {
@@ -74,12 +73,13 @@ export default class AuthController {
 
   async sendOTP(req: Request, res: Response, next: NextFunction) {
     try {
-      const { to, method } = req.body;
-      const { otpId } = await this.otpService.sendOTP({
+      const { to, method, service } = req.body;
+      const { otpId, expiredAt } = await this.otpService.sendOTP({
         to: normalizeEmail(to),
         method,
+        service
       });
-      return res.json({ otpId });
+      return res.json({ otpId, expiredAt });
     } catch (err) {
       next(err);
     }
@@ -88,8 +88,8 @@ export default class AuthController {
   async verifyOTP(req: Request, res: Response, next: NextFunction) {
     try {
       let { otpId, otpCode } = req.body;
-      let otpToken = await this.otpService.verifyOTP({ otpId, otpCode });
-      return res.json({ otpToken });
+      let data = await this.otpService.verifyOTP({ otpId, otpCode });
+      return res.json(data);
     } catch (err) {
       next(err);
     }

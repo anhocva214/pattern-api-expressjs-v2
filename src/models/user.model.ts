@@ -14,6 +14,7 @@ export class User extends BaseModel {
   locked: boolean;
   fullnameSlug?: string;
   birthday: Date | null
+  updatedInfo: boolean
 
   constructor(obj?: Partial<User>) {
     super(obj as any);
@@ -27,6 +28,7 @@ export class User extends BaseModel {
     this.locked = obj?.locked || false;
     this.fullnameSlug = obj?.fullnameSlug || "";
     this.birthday = obj?.birthday || null
+    this.updatedInfo = obj?.updatedInfo || false
   }
 
   toDataResponse(): IUserResponse {
@@ -53,7 +55,8 @@ const userSchema = new Schema({
   updatedAt: Date,
   locked: Boolean,
   fullnameSlug: String,
-  birthday: Date
+  birthday: Date,
+  updatedInfo: Boolean
 });
 
 userSchema.set("toObject", {
