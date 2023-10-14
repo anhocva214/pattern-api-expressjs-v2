@@ -1,5 +1,6 @@
 import { Schema, model } from "mongoose";
 import BaseModel from ".";
+import moment from "moment";
 
 
 
@@ -38,6 +39,16 @@ export class User extends BaseModel {
       ...this,
       password: undefined
     };
+  }
+
+  toDataSearch() {
+    return {
+      id: this.id,
+      avatarURL: this.avatarURL,
+      phoneNumber: this.phoneNumber,
+      fullname: this.fullname,
+      birthday: moment(new Date(this.birthday as any)).format("DD/MM/YYYY"),
+    } 
   }
 }
 

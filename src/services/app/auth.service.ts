@@ -7,16 +7,19 @@ import { Token, TokenModel } from "@models/token.model";
 import JwtService from "../jwt.service";
 import moment from "moment";
 import slugify from "@helpers/function.helper";
+import UserService from "./user.service";
 
 export default class AuthService {
   private otpService: OtpService;
   private jwtService: JwtService;
   private LOGIN_EXPIRES_IN: number;
+  private userService: UserService;
 
   constructor() {
     this.otpService = new OtpService();
     this.jwtService = new JwtService();
     this.LOGIN_EXPIRES_IN = 60 * 60 * 24 * 30 * 3; // 3 month
+    this.userService = new UserService();
   }
 
   async preLogin(phoneNumber: string) {
@@ -84,6 +87,7 @@ export default class AuthService {
     user.fullnameSlug = slugify(user.fullname);
     user.preCreate();
     let newUser = new User(await UserModel.create(user));
+    await this.userService.addDataSearch(newUser.id || "")
     return { userId: newUser.id };
   }
 }

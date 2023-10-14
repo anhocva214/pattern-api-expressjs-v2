@@ -63,6 +63,10 @@ export default class UsersRouter extends BaseRouter {
       this.controller.myInfo.bind(this.controller)
     );
     this.router.get(
+      this.path("/async-search"),
+      this.controller.asyncSearch.bind(this.controller)
+    );
+    this.router.get(
       this.path("/:userId"),
       this.controller.get.bind(this.controller)
     );
@@ -76,5 +80,6 @@ export default class UsersRouter extends BaseRouter {
       formValidate(this.validator.resetPassword()),
       this.controller.resetPassword.bind(this.controller)
     );
+   
   }
 }

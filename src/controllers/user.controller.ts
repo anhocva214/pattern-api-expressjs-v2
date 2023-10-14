@@ -11,6 +11,8 @@ import _ from "lodash";
 import slugify from "@helpers/function.helper";
 import { FileUpload } from "@models/upload.model";
 import UserService from "@services/app/user.service";
+import { Hits } from "meilisearch";
+import { FilterQuery } from "mongoose";
 
 export default class UserController {
   private jwtService: JwtService;
@@ -74,10 +76,10 @@ export default class UserController {
       avatarFile,
       fullname,
       birthday,
-      gender
+      gender,
     });
 
-    return res.json(data)
+    return res.json(data);
   }
 
   // lock
@@ -108,92 +110,19 @@ export default class UserController {
   async getAll(req: Request, res: Response) {
     const page = parseInt(req.query.page?.toString() || "1");
     const limit = parseInt(req.query.limit?.toString() || "10");
-    let role = req.query.role?.toString();
+    let search = req.query.search?.toString() || "";
+    let role = req.query.role?.toString() || "user";
     let locked = req.query.locked?.toString() == "true";
-    const email = req.query.email?.toString() || "";
-    const fullname = req.query.fullname?.toString() || "";
 
-    //  let users = await UserModel.find({})
-    //  await Promise.all(users.map(async user => {
-    //   await UserModel.updateOne({_id: user._id}, {fullnameSlug: slugify(user.fullname)})
-    //  }))
-
-    let data = await UserModel.aggregate([
-      {
-        $match: {
-          $and: [
-            fullname
-              ? {
-                  fullnameSlug: {
-                    $regex: `.*${slugify(fullname)}.*`,
-                    $options: "i",
-                  },
-                }
-              : {},
-            role ? { role } : {},
-            locked ? { locked } : {},
-            email ? { email } : {},
-          ],
-        },
-      },
-      {
-        $sort: { createdAt: -1 },
-      },
-      {
-        $skip: limit * (page - 1),
-      },
-      {
-        $limit: limit,
-      },
-      {
-        $project: {
-          _id: 0,
-          id: "$_id",
-          fullname: 1,
-          email: 1,
-          phoneNumber: 1,
-          career: 1,
-          balance: 1,
-          createdAt: 1,
-          updatedAt: 1,
-          locked: 1,
-          birthday: 1,
-          workUnit: 1,
-          followAlert: 1,
-          purposesUsing: 1,
-          service: 1,
-        },
-      },
-    ]);
-
-    let dataTotal = await UserModel.aggregate([
-      {
-        $match: {
-          $and: [
-            fullname
-              ? {
-                  fullnameSlug: {
-                    $regex: `.*${slugify(fullname)}.*`,
-                    $options: "i",
-                  },
-                }
-              : {},
-            role ? { role } : {},
-            locked ? { locked } : {},
-            email ? { email } : {},
-          ],
-        },
-      },
-    ]);
-
-    return res.json({
-      data,
-      paginate: {
-        page,
-        limit,
-        totalPages: Math.ceil(dataTotal.length / limit),
-      },
+    let data = await this.userService.getList({
+      page,
+      limit,
+      role,
+      locked,
+      search,
     });
+
+    return res.json(data);
   }
 
   async get(req: Request, res: Response, next: NextFunction) {
@@ -271,6 +200,15 @@ export default class UserController {
         type: "reset_password_token",
       });
 
+      return res.json({});
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async asyncSearch(req: Request, res: Response, next: NextFunction) {
+    try {
+      await this.userService.asyncSearch();
       return res.json({});
     } catch (err) {
       next(err);
