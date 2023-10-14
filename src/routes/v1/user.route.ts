@@ -5,6 +5,7 @@ import middleware from "@middleware/jwt.middleware";
 import rateLimit from "express-rate-limit";
 import BaseRouter from "../base.route";
 import { formValidate } from "@validators/index";
+import UploadService from "@services/upload.service";
 
 const apiLimiter = rateLimit({
   windowMs: 2 * 60 * 1000, // 2 minutes
@@ -16,11 +17,13 @@ const apiLimiter = rateLimit({
 export default class UsersRouter extends BaseRouter {
   private controller: UserController;
   private validator: UsersValidator;
+  private uploadService: UploadService
 
   constructor(router: Router) {
     super({ pathBase: "/users", router });
     this.controller = new UserController();
     this.validator = new UsersValidator();
+    this.uploadService = new UploadService();
   }
 
   instance() {
@@ -37,6 +40,8 @@ export default class UsersRouter extends BaseRouter {
 
     this.router.put(
       this.path("/"),
+      middleware("me.update_info"),
+      this.uploadService.instance().single("avatarFile"),
       formValidate(this.validator.update()),
       this.controller.update.bind(this.controller)
     );
@@ -54,6 +59,7 @@ export default class UsersRouter extends BaseRouter {
     );
     this.router.get(
       this.path("/me"),
+      middleware("me.get_info"),
       this.controller.myInfo.bind(this.controller)
     );
     this.router.get(

@@ -10,12 +10,14 @@ export default class UserService {
 
   async update(
     userId: string,
-    obj: { avatarFile: FileUpload; fullname: string; birthday: Date }
+    obj: { avatarFile: FileUpload; fullname: string; birthday: Date, gender: string }
   ) {
+    console.log(obj)
     let user = new User((await UserModel.findById(userId)) as any);
 
     if (obj.avatarFile.path) {
       let avatarURL = await this.cloudinaryService.upload(obj.avatarFile);
+      if (user.avatarURL)
       await this.cloudinaryService.delete(user.avatarURL);
       user.avatarURL = avatarURL;
     }
@@ -26,6 +28,8 @@ export default class UserService {
         avatarURL: user.avatarURL,
         fullname: obj.fullname,
         birthday: obj.birthday,
+        gender: obj?.gender,
+        updatedInfo: true,
         updatedAt: new Date(),
       }
     );

@@ -2,7 +2,7 @@ import { AppError } from "@models/error";
 import { TAcPermission, TAcResource } from "@models/interface";
 import { TUserPermission } from "@models/role.model";
 import { TokenModel } from "@models/token.model";
-import { UserModel } from "@models/user.model";
+import { User, UserModel } from "@models/user.model";
 import AccessControlService from "@services/access-control.service";
 import JwtService from "@services/jwt.service";
 import logger from "@services/logger.service";
@@ -48,7 +48,7 @@ export default function middleware(permission?: TUserPermission) {
         return res.status(401).send({ message: "Người dùng đã bị xoá" });
       } else if (!!user?.locked) {
         return res.status(403).send({ message: "Tài khoản đã bị khoá" });
-      } else if (!user?.updatedInfo) {
+      } else if (!user?.updatedInfo && permission != "me.update_info" && permission != "me.get_info") {
         throw new AppError({
           message: "Người dùng chưa cập nhật thông tin lần đầu tiên",
           statusCode: StatusCodes.BAD_REQUEST,
@@ -63,7 +63,7 @@ export default function middleware(permission?: TUserPermission) {
           .json({ message: "Bạn không có quyền" });
       }
 
-      req.user = user;
+      req.user = new User(user);
       req.token = accessToken;
 
       next();
@@ -82,7 +82,11 @@ export default function middleware(permission?: TUserPermission) {
             .send({ message: "Người dùng đã hết hạn đăng nhập" });
         } else if (err.message == "jwt must be provided") {
           return res.status(422).send({ message: "Vui lòng đăng nhập" });
-        } else return res.status(401).send({ message: "Vui lòng đăng nhập" });
+        }
+        else if (err.message == "jwt malformed") {
+          return res.status(422).send({ message: "Vui lòng đăng nhập lại" });
+        } 
+        else next(err)
       }
     }
   };

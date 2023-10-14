@@ -48,25 +48,8 @@ export default class UsersValidator {
   update() {
     return [
       check("fullname").not().isEmpty().withMessage(MESSAGE_TYPE.required),
-      check("email")
-        .not()
-        .isEmpty()
-        .withMessage(MESSAGE_TYPE.required)
-        .isEmail()
-        .withMessage("is_not_format")
-        .trim()
-        .normalizeEmail()
-        .custom(async (email: string, { req }) => {
-          let user = new User(req.user);
-          const existingUser = await UserModel.findOne({
-            email,
-            role: user.role,
-          });
-          if (existingUser && existingUser?.id != user?.id) {
-            throw new Error("is_exists");
-          }
-        }),
-      check("phoneNumber").not().isEmpty().withMessage(MESSAGE_TYPE.required),
+      check("gender").not().isEmpty().withMessage(MESSAGE_TYPE.required),
+      check("birthday").not().isEmpty().withMessage(MESSAGE_TYPE.required),
     ];
   }
 

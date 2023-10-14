@@ -7,4 +7,5 @@ jet-logger.log
 /dist/
 /logs/
 /uploads/*
+!/uploads/.gitkeep
 *.log

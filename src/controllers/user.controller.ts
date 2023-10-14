@@ -68,16 +68,16 @@ export default class UserController {
   async update(req: Request, res: Response) {
     let user = new User(req.user);
     let avatarFile = new FileUpload(req.file as any);
-    let { fullname, birthday } = req.body;
+    let { fullname, birthday, gender } = req.body;
 
     let data = await this.userService.update(user.id || "", {
       avatarFile,
       fullname,
       birthday,
+      gender
     });
 
     return res.json(data)
-
   }
 
   // lock
