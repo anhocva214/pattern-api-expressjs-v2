@@ -214,4 +214,40 @@ export default class UserController {
       next(err);
     }
   }
+
+  async requestDating(req: Request, res: Response, next: NextFunction) {
+    try {
+      let user = new User(req.user);
+      let parentId = req.params.parentId?.toString() || "";
+
+      await this.userService.requestDating(user, parentId);
+
+      return res.json({});
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async approveDating(req: Request, res: Response, next: NextFunction) {
+    try {
+      let user = new User(req.user);
+      let coupleId = req.params.coupleId?.toString() || "";
+
+      await this.userService.approveDating(user, coupleId);
+
+      return res.json({});
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  async getMyNotifications(req: Request, res: Response, next: NextFunction) {
+    try{
+      let data = await this.userService.getMyNotifications(req.user.id)
+      return res.json(data);
+    }
+    catch (err) {
+      next(err);
+    }
+  }
 }

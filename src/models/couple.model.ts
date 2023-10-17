@@ -2,7 +2,7 @@ import { Schema, model } from "mongoose";
 import BaseModel from ".";
 import { User } from "./user.model";
 
-export const LIST_COUPLE_STATUS = ["dating", "broke_up"];
+export const LIST_COUPLE_STATUS = ["dating", "broke_up", "requesting" , ""] as const;
 export type TCoupleStatus = (typeof LIST_COUPLE_STATUS)[number];
 
 export class Couple extends BaseModel {
@@ -18,10 +18,17 @@ export class Couple extends BaseModel {
   }
 }
 
-interface ICoupleResponse extends BaseModel {
+export class CoupleResponse extends BaseModel {
   userApprove: User;
   userRequest: User;
   status: TCoupleStatus;
+
+  constructor(obj?: Couple){
+    super(obj as any);
+    this.userRequest = new User(obj?.userRequestId as any)
+    this.userApprove = new User(obj?.userApproveId as any)
+    this.status = obj?.status as TCoupleStatus
+  }
 }
 
 const coupleSchema = new Schema({
@@ -40,4 +47,4 @@ coupleSchema.set("toObject", {
   },
 });
 
-export const CoupleModel = model<User>("Couple", coupleSchema, "Couple");
+export const CoupleModel = model<Couple>("Couple", coupleSchema, "Couple");

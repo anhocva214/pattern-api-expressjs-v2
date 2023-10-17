@@ -1,7 +1,12 @@
 import { ENV } from "@helpers/env.helper";
+import { Couple, CoupleModel, CoupleResponse } from "@models/couple.model";
+import { AppError } from "@models/error";
+import { Notification, NotificationModel } from "@models/notification.model";
 import { FileUpload } from "@models/upload.model";
 import { User, UserModel } from "@models/user.model";
 import CloudinaryService from "@services/cloudinary.service";
+import { StatusCodes } from "http-status-codes";
+import _ from "lodash";
 import MeiliSearch, { Hits } from "meilisearch";
 import { FilterQuery } from "mongoose";
 
@@ -137,10 +142,10 @@ export default class UserService {
       ...(!!search && {
         _id: { $in: idsSearched },
       }),
-      updatedInfo: true
+      updatedInfo: true,
     };
 
-    let dataModel = UserModel.find(filterQuery).sort({createdAt: -1});
+    let dataModel = UserModel.find(filterQuery).sort({ createdAt: -1 });
 
     if (!search) {
       dataModel.skip(limit * (page - 1)).limit(limit);
@@ -150,7 +155,23 @@ export default class UserService {
       (
         await dataModel
       ).map(async (item) => {
-        let obj = (new User(item)).toDataResponse();
+        let obj = new User(item).toDataResponse();
+        let couple = new CoupleResponse(await CoupleModel.findOne({
+          $or: [{ userRequestId: obj.id }, { userApproveId: obj.id }],
+          status: "dating",
+        })
+          .populate("userApproveId")
+          .populate("userRequestId") as any);
+
+        let parent;
+
+        if (couple?.id  && couple.userApprove.id == obj.id){
+          parent = new User(couple.userApprove).toDataSearch()
+        }
+        else if (couple?.id  && couple.userRequest.id == obj.id){
+          parent = new User(couple.userApprove).toDataSearch()
+        }
+
 
         if (search) {
           let formatted = dataSearched.find(
@@ -159,6 +180,7 @@ export default class UserService {
 
           return {
             ...obj,
+            parent,
             _formatted: {
               phoneNumber: formatted?.phoneNumber,
               fullname: formatted?.fullname,
@@ -166,7 +188,7 @@ export default class UserService {
             },
           };
         } else {
-          return { ...obj };
+          return { ...obj, parent };
         }
       })
     );
@@ -190,5 +212,88 @@ export default class UserService {
         ...(totalRecordsSearched > 0 ? { totalRecords } : {}),
       },
     };
+  }
+
+  async requestDating(user: User, parentId: string) {
+    let checkCouple = await CoupleModel.exists({
+      userRequestId: parentId,
+      userApproveId: user.id,
+      status: "requesting",
+    });
+    if (checkCouple) {
+      throw new AppError({
+        message: `Đối phương đã yêu cầu xác thực với bạn, vui lòng kiểm tra thông báo`,
+        where: "user.service.requestDating",
+        statusCode: StatusCodes.BAD_REQUEST,
+        detail: "",
+      });
+    }
+
+    let couple = new Couple({
+      userRequestId: user.id,
+      userApproveId: parentId,
+      status: "requesting",
+    });
+    couple.preCreate();
+    let newCouple = new Couple(await CoupleModel.create(couple));
+
+    let notification = new Notification({
+      message: `${_.capitalize(
+        user.fullname
+      )} vừa gửi cho bạn một yêu cầu xác thực ghép đôi`,
+      type: "request_dating",
+      toUserIds: [parentId],
+      data: {
+        coupleId: newCouple.id,
+        userRequest: {
+          fullname: user.fullname,
+          avatarUrl: user.avatarURL,
+          birthday: user.birthday,
+          gender: user.gender,
+        },
+      },
+    });
+
+    notification.preCreate();
+    await NotificationModel.create(notification);
+  }
+
+  async approveDating(user: User, coupleId: string) {
+
+
+    let couple = new Couple((await CoupleModel.findById(coupleId)) as any);
+    let checkDating  = await CoupleModel.exists({
+      userRequestId: couple.userRequestId,
+      status: "dating"
+    })
+
+    if (checkDating){
+      throw new AppError({
+        message: `Đối phương đã được ghép đôi với người khác`,
+        where: "user.service.requestDating",
+        statusCode: StatusCodes.BAD_REQUEST,
+        detail: "",
+      })
+    }
+
+    await CoupleModel.updateOne({ _id: coupleId }, { status: "dating" });
+
+    let notification = new Notification({
+      message: `${_.capitalize(
+        user.fullname
+      )} đã chấp nhận yêu cầu xác thực ghép đôi của bạn`,
+      type: "request_dating",
+      toUserIds: [couple.userRequestId],
+    });
+
+    notification.preCreate();
+    await NotificationModel.create(notification);
+  }
+
+  async getMyNotifications(userId: string) {
+    let data = (
+      await NotificationModel.find({ toUserIds: { $in: [userId] } })
+    ).map((item) => new Notification(item));
+    return data;
   }
 }

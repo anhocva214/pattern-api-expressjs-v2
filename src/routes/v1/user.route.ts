@@ -32,6 +32,7 @@ export default class UsersRouter extends BaseRouter {
       formValidate(this.validator.createAdmin()),
       this.controller.createUserAdmin.bind(this.controller)
     );
+
     this.router.put(
       this.path("/update-admin/password"),
       formValidate(this.validator.updatePasswordAdmin()),
@@ -49,37 +50,62 @@ export default class UsersRouter extends BaseRouter {
       this.path("/:userId/lock"),
       this.controller.lock.bind(this.controller)
     );
+
     this.router.post(
       this.path("/:userId/unlock"),
       this.controller.unlock.bind(this.controller)
     );
+
     this.router.get(
       this.path("/"),
       this.controller.getAll.bind(this.controller)
     );
+
     this.router.get(
       this.path("/me"),
       middleware("me.get_info"),
       this.controller.myInfo.bind(this.controller)
     );
+
     this.router.get(
       this.path("/async-search"),
       this.controller.asyncSearch.bind(this.controller)
     );
+
+    this.router.get(
+      this.path("/notifications"),
+      middleware("me.get_notifications"),
+      this.controller.getMyNotifications.bind(this.controller)
+    );
+
     this.router.get(
       this.path("/:userId"),
       this.controller.get.bind(this.controller)
     );
+    
     this.router.post(
       this.path("/reset-password"),
       formValidate(this.validator.requestResetPassword()),
       this.controller.requestResetPassword.bind(this.controller)
     );
+
     this.router.put(
       this.path("/reset-password"),
       formValidate(this.validator.resetPassword()),
       this.controller.resetPassword.bind(this.controller)
     );
    
+    this.router.get(
+      this.path("/request-dating/:parentId"),
+      middleware("me.request_dating"),
+      this.controller.requestDating.bind(this.controller)
+    );
+
+    this.router.get(
+      this.path("/approve-dating/:coupleId"),
+      middleware("me.approve_dating"),
+      this.controller.approveDating.bind(this.controller)
+    );
+
   }
 }
