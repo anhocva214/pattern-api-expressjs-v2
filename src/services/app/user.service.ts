@@ -120,6 +120,26 @@ export default class UserService {
     };
   }
 
+  private async getParent(userId: string){
+    let couple = new CoupleResponse(await CoupleModel.findOne({
+      $or: [{ userRequestId: userId }, { userApproveId: userId }],
+      status: "dating",
+    })
+      .populate("userApproveId")
+      .populate("userRequestId") as any);
+
+    let parent: User = new User({});
+
+    if (couple?.id  && couple.userApprove.id != userId){
+      parent = new User(couple.userApprove)
+    }
+    else if (couple?.id  && couple.userRequest.id != userId){
+      parent = new User(couple.userRequest)
+    }
+
+    return parent.id ? parent.toDataSearch() : null
+  }
+
   async getList(params: {
     page: number;
     limit: number;
@@ -156,22 +176,8 @@ export default class UserService {
         await dataModel
       ).map(async (item) => {
         let obj = new User(item).toDataResponse();
-        let couple = new CoupleResponse(await CoupleModel.findOne({
-          $or: [{ userRequestId: obj.id }, { userApproveId: obj.id }],
-          status: "dating",
-        })
-          .populate("userApproveId")
-          .populate("userRequestId") as any);
-
-        let parent;
-
-        if (couple?.id  && couple.userApprove.id == obj.id){
-          parent = new User(couple.userApprove).toDataSearch()
-        }
-        else if (couple?.id  && couple.userRequest.id == obj.id){
-          parent = new User(couple.userApprove).toDataSearch()
-        }
-
+        
+        let parent = await this.getParent(obj?.id || "")
 
         if (search) {
           let formatted = dataSearched.find(
@@ -212,6 +218,11 @@ export default class UserService {
         ...(totalRecordsSearched > 0 ? { totalRecords } : {}),
       },
     };
+  }
+
+  async getMyInfo(user: User){
+    let parent = await this.getParent(user?.id || "")
+    return {...user, parent}
   }
 
   async requestDating(user: User, parentId: string) {

@@ -103,7 +103,8 @@ export default class UserController {
 
   // get my info
   async myInfo(req: Request, res: Response) {
-    return res.status(200).send(req.user);
+    let data = await this.userService.getMyInfo(new User(req.user))
+    return res.json(data)
   }
 
   // get all users
