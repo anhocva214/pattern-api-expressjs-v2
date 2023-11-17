@@ -15,7 +15,6 @@ export class User extends BaseModel {
   locked: boolean;
   fullnameSlug?: string;
   birthday: Date | null
-  updatedInfo: boolean
   gender: string
 
   constructor(obj?: Partial<User>) {
@@ -30,7 +29,6 @@ export class User extends BaseModel {
     this.locked = obj?.locked || false;
     this.fullnameSlug = obj?.fullnameSlug || "";
     this.birthday = obj?.birthday || null
-    this.updatedInfo = obj?.updatedInfo || false
     this.gender = obj?.gender || ""
   }
 
@@ -69,7 +67,6 @@ const userSchema = new Schema({
   locked: Boolean,
   fullnameSlug: String,
   birthday: Date,
-  updatedInfo: Boolean,
   gender: String
 });
 

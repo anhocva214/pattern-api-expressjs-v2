@@ -1,5 +1,4 @@
 import { AppError } from "@models/error";
-import { TAcPermission, TAcResource } from "@models/interface";
 import { TUserPermission } from "@models/role.model";
 import { TokenModel } from "@models/token.model";
 import { User, UserModel } from "@models/user.model";
@@ -48,13 +47,6 @@ export default function middleware(permission?: TUserPermission) {
         return res.status(401).send({ message: "Người dùng đã bị xoá" });
       } else if (!!user?.locked) {
         return res.status(403).send({ message: "Tài khoản đã bị khoá" });
-      } else if (!user?.updatedInfo && permission != "me.update_info" && permission != "me.get_info") {
-        throw new AppError({
-          message: "Người dùng chưa cập nhật thông tin lần đầu tiên",
-          statusCode: StatusCodes.BAD_REQUEST,
-          where: "middleware",
-          detail: "",
-        });
       }
 
       if (!!permission && !accessControlService.can(user.role, permission)) {

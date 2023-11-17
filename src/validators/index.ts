@@ -22,19 +22,12 @@ export const formValidate = (
 
     const formattedErrors: IErrorValidator = {};
     errors.array().map((error) => {
-      let fieldname = i18nValidator.fieldname.__({
-        phrase: error.param,
-        locale: req.lang,
-      });
       let message = i18nValidator.message
         .__({ phrase: error.msg, locale: req.lang })
         .replace(
           ":fieldname",
-          fieldname == error.param
-            ? i18nValidator.fieldname.__({ phrase: "value", locale: req.lang })
-            : fieldname
+          i18nValidator.fieldname.__({ phrase: "value", locale: req.lang })
         );
-      // let message = i18nValidator.message.__({phrase: error.msg, locale: req.lang}).replace(':fieldname', "").trim()
       if (formattedErrors[error.param]) {
         formattedErrors[error.param].push(message);
       } else {

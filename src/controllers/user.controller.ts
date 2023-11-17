@@ -1,19 +1,15 @@
 import StatusCodes from "http-status-codes";
 import { NextFunction, Request, Response } from "express";
 import { User, UserModel } from "@models/user.model";
-import { Token, TokenModel } from "@models/token.model";
+import { TokenModel } from "@models/token.model";
 import bcrypt from "bcrypt";
 import JwtService from "@services/jwt.service";
 import moment from "moment";
 import MailService from "@services/mail.service";
 import otpGenerator from "otp-generator";
 import _ from "lodash";
-import slugify from "@helpers/function.helper";
 import { FileUpload } from "@models/upload.model";
 import UserService from "@services/app/user.service";
-import { Hits } from "meilisearch";
-import { FilterQuery } from "mongoose";
-
 export default class UserController {
   private jwtService: JwtService;
   private mailService: MailService;
@@ -23,13 +19,6 @@ export default class UserController {
     this.jwtService = new JwtService();
     this.mailService = new MailService();
     this.userService = new UserService();
-  }
-
-  private generateOTPCode() {
-    return otpGenerator.generate(6, {
-      upperCaseAlphabets: false,
-      specialChars: false,
-    });
   }
 
   async createUserAdmin(req: Request, res: Response, next: NextFunction) {
@@ -107,41 +96,6 @@ export default class UserController {
     return res.json(data)
   }
 
-  // get all users
-  async getAll(req: Request, res: Response) {
-    const page = parseInt(req.query.page?.toString() || "1");
-    const limit = parseInt(req.query.limit?.toString() || "10");
-    let search = req.query.search?.toString() || "";
-    let role = req.query.role?.toString() || "user";
-    let locked = req.query.locked?.toString() == "true";
-
-    let data = await this.userService.getList({
-      page,
-      limit,
-      role,
-      locked,
-      search,
-    });
-
-    return res.json(data);
-  }
-
-  async get(req: Request, res: Response, next: NextFunction) {
-    try {
-      // let userId = req.params.userId;
-      // let user = (
-      //   await UserModel.findById(userId).select("-password")
-      // )?.toObject();
-      // let sub = (await SubscriptionModel.findOne({ user: userId }))?.toObject();
-      // return res.json({
-      //   user,
-      //   subscription: sub,
-      // });
-    } catch (err) {
-      next(err);
-    }
-  }
-
   async requestResetPassword(req: Request, res: Response, next: NextFunction) {
     try {
       let { email } = req.body;
@@ -203,51 +157,6 @@ export default class UserController {
 
       return res.json({});
     } catch (err) {
-      next(err);
-    }
-  }
-
-  async asyncSearch(req: Request, res: Response, next: NextFunction) {
-    try {
-      await this.userService.asyncSearch();
-      return res.json({});
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  async requestDating(req: Request, res: Response, next: NextFunction) {
-    try {
-      let user = new User(req.user);
-      let parentId = req.params.parentId?.toString() || "";
-
-      await this.userService.requestDating(user, parentId);
-
-      return res.json({});
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  async approveDating(req: Request, res: Response, next: NextFunction) {
-    try {
-      let user = new User(req.user);
-      let coupleId = req.params.coupleId?.toString() || "";
-
-      await this.userService.approveDating(user, coupleId);
-
-      return res.json({});
-    } catch (err) {
-      next(err);
-    }
-  }
-
-  async getMyNotifications(req: Request, res: Response, next: NextFunction) {
-    try{
-      let data = await this.userService.getMyNotifications(req.user.id)
-      return res.json(data);
-    }
-    catch (err) {
       next(err);
     }
   }

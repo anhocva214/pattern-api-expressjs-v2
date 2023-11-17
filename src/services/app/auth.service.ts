@@ -87,7 +87,6 @@ export default class AuthService {
     user.fullnameSlug = slugify(user.fullname);
     user.preCreate();
     let newUser = new User(await UserModel.create(user));
-    await this.userService.addDataSearch(newUser.id || "")
     return { userId: newUser.id };
   }
 }

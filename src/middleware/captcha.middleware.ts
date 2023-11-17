@@ -1,6 +1,5 @@
 import { AppError } from "@models/error";
 import { TokenModel } from "@models/token.model";
-import { User } from "@models/user.model";
 import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 

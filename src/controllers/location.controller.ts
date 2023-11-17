@@ -3,7 +3,6 @@ import DataCities from "@resources/data-location/cities.json";
 import DataDistricts from "@resources/data-location/districts.json";
 import DataWards from "@resources/data-location/wards.json";
 import { NextFunction, Request, Response } from "express";
-import { StatusCodes } from "http-status-codes";
 
 export default class LocationController {
   private cities: ICities[];

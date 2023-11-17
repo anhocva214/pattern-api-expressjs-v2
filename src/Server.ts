@@ -54,14 +54,9 @@ declare module "express" {
 }
 
 // Connect database
-connectMongoDB()
-  .then(async () => {
-    logger.info("Connect database success")
-    
-    // Setup roles
-    await (new AccessControlService()).init()
-  })
-  .catch((err) => logger.error(err));
+(async () => {
+  await connectMongoDB();
+})();
 
 
 // Handle accept language
