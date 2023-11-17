@@ -1,6 +1,6 @@
 import {
   ALL_PERMISSIONS,
-  ME_PERMISSIONS,
+  USER_PERMISSIONS,
 } from "@helpers/access-control.helper";
 import { AppError } from "@models/error";
 import Role, { RoleModel, TUserPermission } from "@models/role.model";
@@ -10,19 +10,41 @@ import logger from "./logger.service";
 
 export default class AccessControlService {
   allPermissions = ALL_PERMISSIONS;
-  mePermissions = ME_PERMISSIONS;
+  userPermission = USER_PERMISSIONS;
 
   constructor() {}
 
   async init() {
     if (!(await this.existRole("super_admin"))) {
-      await this.createRole("super_admin", this.allPermissions);
+      await this.createRole({
+        value: "super_admin",
+        permissions: [...this.allPermissions],
+        alowUpdate: false,
+      });
       logger.info("Create role super_admin successfully");
+    } else {
+      await this.updateRole({
+        value: "super_admin",
+        permissions: [...this.allPermissions],
+        alowUpdate: false,
+      });
+      logger.info("Update role super_admin successfully");
     }
 
     if (!(await this.existRole("user"))) {
-      await this.createRole("user", [...this.mePermissions]);
+      await this.createRole({
+        value: "user",
+        permissions: [...this.userPermission],
+        alowUpdate: false,
+      });
       logger.info("Create role user successfully");
+    } else {
+      await this.updateRole({
+        value: "user",
+        permissions: [...this.userPermission],
+        alowUpdate: false,
+      });
+      logger.info("Update role user successfully");
     }
   }
 
@@ -38,13 +60,14 @@ export default class AccessControlService {
     }
   }
 
-  async createRole(roleValue: string, permissions: TUserPermission[]) {
-    this.checkInvalidPermissions(permissions);
+  async createRole(data: {
+    value: string;
+    permissions: TUserPermission[];
+    alowUpdate: boolean;
+  }) {
+    this.checkInvalidPermissions(data.permissions);
 
-    let role = new Role({
-      value: roleValue,
-      permissions,
-    });
+    let role = new Role(data);
     role.preCreate();
     await RoleModel.create(role);
   }
@@ -53,15 +76,16 @@ export default class AccessControlService {
     return await RoleModel.exists({ value: roleValue });
   }
 
-  async updateRole(roleValue: string, permissions: TUserPermission[]) {
-    this.checkInvalidPermissions(permissions);
+  async updateRole(data: {
+    value: string;
+    permissions: TUserPermission[];
+    alowUpdate: boolean;
+  }) {
+    this.checkInvalidPermissions(data.permissions);
 
-    let role = new Role({
-      value: roleValue,
-      permissions,
-    });
+    let role = new Role(data);
     role.preUpdate();
-    await RoleModel.updateOne({ value: roleValue }, role);
+    await RoleModel.updateOne({ value: data.value }, role);
   }
 
   async deleteRole(roleValue: string) {

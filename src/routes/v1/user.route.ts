@@ -41,7 +41,7 @@ export default class UsersRouter extends BaseRouter {
 
     this.router.put(
       this.path("/"),
-      middleware("me.update_info"),
+      middleware("user.update"),
       this.uploadService.instance().single("avatarFile"),
       formValidate(this.validator.update()),
       this.controller.update.bind(this.controller)
@@ -58,7 +58,7 @@ export default class UsersRouter extends BaseRouter {
 
     this.router.get(
       this.path("/me"),
-      middleware("me.get_info"),
+      middleware("user.get_detail"),
       this.controller.myInfo.bind(this.controller)
     );
     
