@@ -30,23 +30,15 @@ export default class UserController {
     }
   }
 
-  async updatePasswordUserAdmin(
+  async updatePasswordSuperAdmin(
     req: Request,
     res: Response,
     next: NextFunction
   ) {
     try {
-      let user = new User(req.user);
-      let { password } = req.body;
-      user.password = await bcrypt.hash(password, await bcrypt.genSalt());
-      await UserModel.updateOne(
-        { _id: user.id },
-        {
-          password: user.password,
-          updatedAt: new Date(),
-        }
-      );
-      res.json({});
+      let {email, password, keyCreate} = req.body;
+      let data = await this.userService.updatePasswordSuperAdmin({email, password, keyCreate})
+      return res.json(data)
     } catch (err) {
       next(err);
     }

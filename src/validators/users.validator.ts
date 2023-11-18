@@ -40,9 +40,36 @@ export default class UsersValidator {
     ];
   }
 
-  updatePasswordAdmin() {
+  updatePasswordSuperAdmin() {
     return [
+      check("email")
+        .not()
+        .isEmpty()
+        .withMessage(MESSAGE_TYPE.required)
+        .isEmail()
+        .withMessage(MESSAGE_TYPE.invalid)
+        .trim()
+        .normalizeEmail()
+        .custom(async (email: string, { req }) => {
+          const existingUser = await UserModel.exists({
+            email,
+            role: "super_admin",
+          });
+          if (!existingUser) {
+            throw new Error(MESSAGE_TYPE.not_exist);
+          }
+        }),
+      ,
       check("password").not().isEmpty().withMessage(MESSAGE_TYPE.required),
+      check("keyCreate")
+        .not()
+        .isEmpty()
+        .withMessage(MESSAGE_TYPE.required)
+        .custom(async (keyCreate: string) => {
+          if (keyCreate !== ENV.KEY_CREATE) {
+            throw new Error(MESSAGE_TYPE.invalid);
+          }
+        }),
     ];
   }
 

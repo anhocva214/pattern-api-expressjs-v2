@@ -2,5 +2,6 @@
   "required": ":fieldname không được bỏ trống",
   "exists": ":fieldname đã tồn tại",
   "invalid": ":fieldname không hợp lệ",
-	"numeric": ":fieldname bắt buộc là số"
+	"numeric": ":fieldname bắt buộc là số",
+	"not_exist": ":fieldname không tồn tại"
 }

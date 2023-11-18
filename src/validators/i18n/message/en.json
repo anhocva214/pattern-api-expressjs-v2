@@ -2,5 +2,6 @@
 	"required": ":fieldname cannot be empty",
 	"exists": ":fieldname is exists",
 	"invalid": "Invalid :fieldname",
-	"numeric": ":fieldname must be numeric"
+	"numeric": ":fieldname must be numeric",
+	"not_exist": ":fieldname does not exist"
 }

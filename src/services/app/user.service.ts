@@ -23,7 +23,19 @@ export default class UserService {
     user.password = await bcrypt.hash(user.password, await bcrypt.genSalt());
     user.preCreate();
     let newUser = await UserModel.create(user);
-    return new User(newUser as any);
+    return new User(newUser as any).toDataResponse();
+  }
+
+  async updatePasswordSuperAdmin(data: {
+    email: string;
+    password: string;
+    keyCreate: string;
+  }) {
+    let user = new User(await UserModel.findOne({email: data.email}) as any);
+    user.password = await bcrypt.hash(user.password, await bcrypt.genSalt());
+    user.preUpdate();
+    await UserModel.updateOne({_id: user.id}, user)
+    return new User(await UserModel.findOne({email: data.email}) as any).toDataResponse();
   }
 
   async update(

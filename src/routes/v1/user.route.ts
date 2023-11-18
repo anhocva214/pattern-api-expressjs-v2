@@ -28,15 +28,15 @@ export default class UsersRouter extends BaseRouter {
 
   instance() {
     this.router.post(
-      this.path("/create-super-admin"),
+      this.path("/super-admin/create"),
       formValidate(this.validator.createSuperAdmin()),
       this.controller.createSuperAdmin.bind(this.controller)
     );
 
     this.router.put(
-      this.path("/update-admin/password"),
-      formValidate(this.validator.updatePasswordAdmin()),
-      this.controller.updatePasswordUserAdmin.bind(this.controller)
+      this.path("/super-admin/password"),
+      formValidate(this.validator.updatePasswordSuperAdmin()),
+      this.controller.updatePasswordSuperAdmin.bind(this.controller)
     );
 
     this.router.put(
