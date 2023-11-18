@@ -1,7 +1,6 @@
 import { UploadController } from '@controllers/upload.controller';
 import { Router } from 'express';
 import BaseRouter from '../base.route';
-import middleware from '@middleware/jwt.middleware';
 
 
 export default class UploadRouter extends BaseRouter {

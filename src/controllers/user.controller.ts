@@ -6,7 +6,6 @@ import bcrypt from "bcrypt";
 import JwtService from "@services/jwt.service";
 import moment from "moment";
 import MailService from "@services/mail.service";
-import otpGenerator from "otp-generator";
 import _ from "lodash";
 import { FileUpload } from "@models/upload.model";
 import UserService from "@services/app/user.service";
@@ -21,13 +20,11 @@ export default class UserController {
     this.userService = new UserService();
   }
 
-  async createUserAdmin(req: Request, res: Response, next: NextFunction) {
+  async createSuperAdmin(req: Request, res: Response, next: NextFunction) {
     try {
-      let user = new User(req.body);
-      user.password = await bcrypt.hash(user.password, await bcrypt.genSalt());
-      user.preCreate();
-      await UserModel.create(user);
-      res.json({});
+      let {fullname, email, password, keyCreate} = req.body;
+      let data = await this.userService.createSuperAdmin({fullname, email,password, keyCreate})
+      res.json(data);
     } catch (err) {
       next(err);
     }

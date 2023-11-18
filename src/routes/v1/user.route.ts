@@ -28,9 +28,9 @@ export default class UsersRouter extends BaseRouter {
 
   instance() {
     this.router.post(
-      this.path("/create-admin"),
-      formValidate(this.validator.createAdmin()),
-      this.controller.createUserAdmin.bind(this.controller)
+      this.path("/create-super-admin"),
+      formValidate(this.validator.createSuperAdmin()),
+      this.controller.createSuperAdmin.bind(this.controller)
     );
 
     this.router.put(

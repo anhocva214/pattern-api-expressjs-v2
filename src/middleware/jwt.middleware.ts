@@ -2,7 +2,7 @@ import { AppError } from "@models/error";
 import { TUserPermission } from "@models/role.model";
 import { TokenModel } from "@models/token.model";
 import { User, UserModel } from "@models/user.model";
-import AccessControlService from "@services/access-control.service";
+import AccessControlService from "@services/app/access-control.service";
 import JwtService from "@services/jwt.service";
 import logger from "@services/logger.service";
 import { NextFunction, Request, Response } from "express";

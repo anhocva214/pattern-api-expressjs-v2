@@ -6,7 +6,7 @@ import { MESSAGE_TYPE } from "./i18n/type";
 export default class UsersValidator {
   constructor() {}
 
-  createAdmin() {
+  createSuperAdmin() {
     return [
       check("fullname").not().isEmpty().withMessage(MESSAGE_TYPE.required),
       check("email")
@@ -20,7 +20,7 @@ export default class UsersValidator {
         .custom(async (email: string, { req }) => {
           const existingUser = await UserModel.exists({
             email,
-            role: req.body.role,
+            role: "super_admin",
           });
           if (existingUser) {
             throw new Error(MESSAGE_TYPE.exists);
@@ -37,12 +37,13 @@ export default class UsersValidator {
             throw new Error(MESSAGE_TYPE.invalid);
           }
         }),
-      check("role").isIn(["admin", "writer"]).withMessage(MESSAGE_TYPE.invalid),
     ];
   }
 
   updatePasswordAdmin() {
-    return [check("password").not().isEmpty().withMessage(MESSAGE_TYPE.required)];
+    return [
+      check("password").not().isEmpty().withMessage(MESSAGE_TYPE.required),
+    ];
   }
 
   update() {

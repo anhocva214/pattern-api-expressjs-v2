@@ -1,5 +1,5 @@
 import { ENV } from "@helpers/env.helper";
-import AccessControlService from "@services/access-control.service";
+import AccessControlService from "@services/app/access-control.service";
 import logger from "@services/logger.service";
 import { connect, connection } from "mongoose";
 

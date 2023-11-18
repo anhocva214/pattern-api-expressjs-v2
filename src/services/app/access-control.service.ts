@@ -1,16 +1,17 @@
 import {
   ALL_PERMISSIONS,
   USER_PERMISSIONS,
+  SUPER_ADMIN_PERMISSIONS,
 } from "@helpers/access-control.helper";
 import { AppError } from "@models/error";
 import Role, { RoleModel, TUserPermission } from "@models/role.model";
 import { StatusCodes } from "http-status-codes";
 import _ from "lodash";
-import logger from "./logger.service";
+import logger from "../logger.service";
 
 export default class AccessControlService {
-  allPermissions = ALL_PERMISSIONS;
-  userPermission = USER_PERMISSIONS;
+  private allPermissions = ALL_PERMISSIONS;
+  private userPermission = USER_PERMISSIONS;
 
   constructor() {}
 
@@ -69,7 +70,8 @@ export default class AccessControlService {
 
     let role = new Role(data);
     role.preCreate();
-    await RoleModel.create(role);
+    let newData = await RoleModel.create(role);
+    return new Role(newData);
   }
 
   async existRole(roleValue: string) {
@@ -86,6 +88,10 @@ export default class AccessControlService {
     let role = new Role(data);
     role.preUpdate();
     await RoleModel.updateOne({ value: data.value }, role);
+    let newData = new Role(
+      (await RoleModel.findOne({ value: data.value })) as any
+    );
+    return newData;
   }
 
   async deleteRole(roleValue: string) {
@@ -97,5 +103,9 @@ export default class AccessControlService {
       value: roleValue,
       permissions: { $all: [permission] },
     });
+  }
+
+  getAllPermissions() {
+    return _.difference(this.allPermissions, [...SUPER_ADMIN_PERMISSIONS]);
   }
 }

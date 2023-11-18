@@ -13,7 +13,7 @@ import logger from "@services/logger.service";
 import { ENV } from "@helpers/env.helper";
 import moment from "moment";
 import { connectMongoDB } from "@config/db.config";
-import AccessControlService from "@services/access-control.service";
+import AccessControlService from "@services/app/access-control.service";
 
 const app = express();
 const { BAD_REQUEST } = StatusCodes;
