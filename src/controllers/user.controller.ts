@@ -22,8 +22,13 @@ export default class UserController {
 
   async createSuperAdmin(req: Request, res: Response, next: NextFunction) {
     try {
-      let {fullname, email, password, keyCreate} = req.body;
-      let data = await this.userService.createSuperAdmin({fullname, email,password, keyCreate})
+      let { fullname, email, password, keyCreate } = req.body;
+      let data = await this.userService.createSuperAdmin({
+        fullname,
+        email,
+        password,
+        keyCreate,
+      });
       res.json(data);
     } catch (err) {
       next(err);
@@ -36,9 +41,13 @@ export default class UserController {
     next: NextFunction
   ) {
     try {
-      let {email, password, keyCreate} = req.body;
-      let data = await this.userService.updatePasswordSuperAdmin({email, password, keyCreate})
-      return res.json(data)
+      let { email, password, keyCreate } = req.body;
+      let data = await this.userService.updatePasswordSuperAdmin({
+        email,
+        password,
+        keyCreate,
+      });
+      return res.json(data);
     } catch (err) {
       next(err);
     }
@@ -81,8 +90,8 @@ export default class UserController {
 
   // get my info
   async myInfo(req: Request, res: Response) {
-    let data = await this.userService.getMyInfo(new User(req.user))
-    return res.json(data)
+    let data = await this.userService.getMyInfo(new User(req.user));
+    return res.json(data);
   }
 
   async requestResetPassword(req: Request, res: Response, next: NextFunction) {

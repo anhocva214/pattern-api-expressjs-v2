@@ -1,6 +1,7 @@
 import { check, validationResult } from "express-validator";
 import { MESSAGE_TYPE } from "./i18n/type";
 import { LIST_OTP_SERVICES } from "@models/token.model";
+import { RoleModel } from "@models/role.model";
 
 export default class AuthValidator {
   constructor() {}
@@ -11,9 +12,13 @@ export default class AuthValidator {
         .not()
         .isEmpty()
         .withMessage(MESSAGE_TYPE.required)
-        .isIn(["user", "admin"])
-        .withMessage(MESSAGE_TYPE.invalid),
-      check("phoneNumber").not().isEmpty().withMessage(MESSAGE_TYPE.required),
+        .custom(async (input: string, { req }) => {
+          const existingUser = await RoleModel.exists({value: input});
+          if (!existingUser) {
+            throw new Error(MESSAGE_TYPE.not_exist);
+          }
+        }),,
+      check("username").not().isEmpty().withMessage(MESSAGE_TYPE.required),
       check("password").not().isEmpty().withMessage(MESSAGE_TYPE.required),
     ];
   }

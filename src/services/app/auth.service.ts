@@ -6,7 +6,7 @@ import { StatusCodes } from "http-status-codes";
 import { Token, TokenModel } from "@models/token.model";
 import JwtService from "../jwt.service";
 import moment from "moment";
-import slugify from "@helpers/function.helper";
+import slugify, { isEmail } from "@helpers/function.helper";
 import UserService from "./user.service";
 
 export default class AuthService {
@@ -22,24 +22,18 @@ export default class AuthService {
     this.userService = new UserService();
   }
 
-  async preLogin(phoneNumber: string) {
-    let user = new User((await UserModel.findOne({ phoneNumber })) as any);
-    if (!user.id) {
-      return {
-        userId: "",
-      };
-    } else {
-      return {
-        userId: user.id,
-      };
-    }
-  }
 
-  async login(phoneNumber: string, password: string, role: string) {
+  async login(data: { username: string; password: string; role: string }) {
     let user = new User(
-      (await UserModel.findOne({ phoneNumber, role })) as any
+      (await UserModel.findOne({
+        ...(isEmail(data.username)
+          ? { email: data.username }
+          : { phoneNumber: data.username }),
+        role: data.role,
+      })) as any
     );
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+
+    if (!user || !(await bcrypt.compare(data.password, user.password))) {
       throw new AppError({
         where: "login",
         message: "login_failure",

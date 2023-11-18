@@ -18,11 +18,6 @@ export default class AuthRouter extends BaseRouter {
 
   instance() {
     this.router.post(
-      this.path("/pre-login"),
-      formValidate(this.validator.preLogin()),
-      this.controller.preLogin.bind(this.controller)
-    );
-    this.router.post(
       this.path("/login"),
       formValidate(this.validator.login()),
       this.controller.login.bind(this.controller)

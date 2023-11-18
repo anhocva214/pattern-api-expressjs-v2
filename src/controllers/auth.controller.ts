@@ -31,8 +31,8 @@ export default class AuthController {
     try {
       let { password } = req.body;
       let phoneNumber = req.otpTo || "";
-      let {userId} = await this.authService.register(phoneNumber, password);
-      res.json({userId});
+      let { userId } = await this.authService.register(phoneNumber, password);
+      res.json({ userId });
     } catch (err) {
       console.log(err);
       next(err);
@@ -42,23 +42,15 @@ export default class AuthController {
   // Login
   async login(req: Request, res: Response, next: NextFunction) {
     try {
-      let { password, phoneNumber, role } = req.body;
-      let data = await this.authService.login(phoneNumber, password, role);
+      let { password, username, role } = req.body;
+      let data = await this.authService.login({
+        username,
+        password,
+        role
+      });
       return res.json(data);
     } catch (err) {
       console.log(err);
-      next(err);
-    }
-  }
-
-  // Pre-login
-  async preLogin(req: Request, res: Response, next: NextFunction) {
-    try {
-      let phoneNumber = req.body.phoneNumber;
-      console.log("🚀 ~ file: auth.controller.ts:58 ~ AuthController ~ preLogin ~ phoneNumber:", phoneNumber)
-      let { userId } = await this.authService.preLogin(phoneNumber);
-      return res.json({ userId });
-    } catch (err) {
       next(err);
     }
   }
@@ -77,7 +69,7 @@ export default class AuthController {
       const { otpId, expiredAt } = await this.otpService.sendOTP({
         to: normalizeEmail(to),
         method,
-        service
+        service,
       });
       return res.json({ otpId, expiredAt });
     } catch (err) {
