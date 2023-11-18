@@ -36,5 +36,10 @@ export default class AccessControlRouter extends BaseRouter {
       formValidate(this.validator.updateRole()),
       this.controller.updateRole.bind(this.controller)
     );
+    this.router.delete(
+      this.path("/role/:roleValue"),
+      middleware("role.delete"),
+      this.controller.deleteRole.bind(this.controller)
+    );
   }
 }

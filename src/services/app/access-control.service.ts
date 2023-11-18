@@ -24,7 +24,7 @@ export default class AccessControlService {
       });
       logger.info("Create role super_admin successfully");
     } else {
-      await RoleModel.deleteOne({value: "super_admin"})
+      await this.deleteRole("super_admin")
       await this.createRole({
         value: "super_admin",
         permissions: [...this.allPermissions],
@@ -41,7 +41,7 @@ export default class AccessControlService {
       });
       logger.info("Create role user successfully");
     } else {
-      await RoleModel.deleteOne({value: "user"})
+      await this.deleteRole("user")
       await this.createRole({
         value: "user",
         permissions: [...this.userPermission],

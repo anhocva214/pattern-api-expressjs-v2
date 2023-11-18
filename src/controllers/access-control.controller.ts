@@ -53,4 +53,15 @@ export default class AccessControlController {
       next(err);
     }
   }
+
+  async deleteRole(req: Request, res: Response, next: NextFunction){
+    try{
+      let roleValue = req.params.roleValue?.toString()||""
+      await this.accessControlService.deleteRole(roleValue)
+      return res.json({})
+    }
+    catch(err){
+      next(err);
+    }
+  }
 }
