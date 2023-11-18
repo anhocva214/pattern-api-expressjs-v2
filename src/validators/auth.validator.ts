@@ -13,8 +13,8 @@ export default class AuthValidator {
         .isEmpty()
         .withMessage(MESSAGE_TYPE.required)
         .custom(async (input: string, { req }) => {
-          const existingUser = await RoleModel.exists({value: input});
-          if (!existingUser) {
+          const existing = await RoleModel.exists({value: input});
+          if (!existing) {
             throw new Error(MESSAGE_TYPE.not_exist);
           }
         }),,

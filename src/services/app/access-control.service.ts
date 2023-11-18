@@ -98,6 +98,11 @@ export default class AccessControlService {
     await RoleModel.deleteOne({ value: roleValue });
   }
 
+  async listRoles(){
+    let data = (await RoleModel.find({})).map(item => new Role(item))
+    return data
+  }
+
   async can(roleValue: string, permission: string) {
     return await RoleModel.exists({
       value: roleValue,

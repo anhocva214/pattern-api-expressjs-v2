@@ -33,4 +33,14 @@ export default class AccessControlController{
             next(err);
         }
     }
+
+    async listRoles(req: Request, res: Response, next: NextFunction){
+        try{
+            let data = await this.accessControlService.listRoles()
+            return res.json(data)
+        }
+        catch(err){
+            next(err);
+        }
+    }
 }
