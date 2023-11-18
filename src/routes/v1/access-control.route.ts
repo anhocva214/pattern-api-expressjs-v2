@@ -30,5 +30,11 @@ export default class AccessControlRouter extends BaseRouter {
       middleware("role.get_list"),
       this.controller.listRoles.bind(this.controller)
     );
+    this.router.put(
+      this.path("/role"),
+      middleware("role.update"),
+      formValidate(this.validator.updateRole()),
+      this.controller.updateRole.bind(this.controller)
+    );
   }
 }

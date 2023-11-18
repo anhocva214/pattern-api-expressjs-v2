@@ -1,7 +1,8 @@
 {
-	"required": ":fieldname cannot be empty",
-	"exists": ":fieldname is exists",
-	"invalid": "Invalid :fieldname",
-	"numeric": ":fieldname must be numeric",
-	"not_exist": ":fieldname does not exist"
+  "required": ":fieldname cannot be empty",
+  "exists": ":fieldname is exists",
+  "invalid": "Invalid :fieldname",
+  "numeric": ":fieldname must be numeric",
+  "not_exist": ":fieldname does not exist",
+  "not_editable": ":fieldname is not editable"
 }

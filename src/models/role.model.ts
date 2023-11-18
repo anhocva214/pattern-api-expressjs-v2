@@ -7,21 +7,21 @@ export type TUserPermission = (typeof ALL_PERMISSIONS)[number];
 export default class Role extends BaseModel {
   value: string;
   permissions: TUserPermission[];
-  alowUpdate: boolean
+  editable: boolean
   constructor(
     obj?: Omit<Role, "createdAt" | "updatedAt" | "preCreate" | "preUpdate">
   ) {
     super(obj as any);
     this.value = obj?.value || "";
     this.permissions = obj?.permissions || [];
-    this.alowUpdate = obj?.alowUpdate || false
+    this.editable = obj?.editable || false
   }
 }
 
 const roleSchema = new Schema({
   value: String,
   permissions: [String],
-  alowUpdate: Boolean,
+  editable: Boolean,
   createdAt: Date,
   updatedAt: Date,
 });

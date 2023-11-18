@@ -20,36 +20,38 @@ export default class AccessControlService {
       await this.createRole({
         value: "super_admin",
         permissions: [...this.allPermissions],
-        alowUpdate: false,
+        editable: false,
       });
       logger.info("Create role super_admin successfully");
     } else {
-      await this.updateRole({
+      await RoleModel.deleteOne({value: "super_admin"})
+      await this.createRole({
         value: "super_admin",
         permissions: [...this.allPermissions],
-        alowUpdate: false,
+        editable: false,
       });
-      logger.info("Update role super_admin successfully");
+      logger.info("Create role super_admin successfully");
     }
 
     if (!(await this.existRole("user"))) {
       await this.createRole({
         value: "user",
         permissions: [...this.userPermission],
-        alowUpdate: false,
+        editable: false,
       });
       logger.info("Create role user successfully");
     } else {
-      await this.updateRole({
+      await RoleModel.deleteOne({value: "user"})
+      await this.createRole({
         value: "user",
         permissions: [...this.userPermission],
-        alowUpdate: false,
+        editable: false,
       });
-      logger.info("Update role user successfully");
+      logger.info("Create role user successfully");
     }
   }
 
-  checkInvalidPermissions(permissions: TUserPermission[]) {
+  private checkInvalidPermissions(permissions: TUserPermission[]) {
     let invalidPermissions = _.difference(permissions, this.allPermissions);
     if (invalidPermissions.length > 0) {
       throw new AppError({
@@ -61,10 +63,22 @@ export default class AccessControlService {
     }
   }
 
+  private async checkEditableRole(roleValue: string){
+    let editable = await RoleModel.exists({value: roleValue, editable: true})
+    if (!editable) {
+      throw new AppError({
+        where: "checkEditableRole",
+        message: `Role is not editable`,
+        statusCode: StatusCodes.BAD_REQUEST,
+        detail: "",
+      });
+    }
+  }
+
   async createRole(data: {
     value: string;
     permissions: TUserPermission[];
-    alowUpdate: boolean;
+    editable: boolean;
   }) {
     this.checkInvalidPermissions(data.permissions);
 
@@ -81,9 +95,10 @@ export default class AccessControlService {
   async updateRole(data: {
     value: string;
     permissions: TUserPermission[];
-    alowUpdate: boolean;
+    editable: boolean;
   }) {
     this.checkInvalidPermissions(data.permissions);
+    await this.checkEditableRole(data.value)
 
     let role = new Role(data);
     role.preUpdate();

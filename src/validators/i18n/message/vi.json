@@ -3,5 +3,6 @@
   "exists": ":fieldname đã tồn tại",
   "invalid": ":fieldname không hợp lệ",
 	"numeric": ":fieldname bắt buộc là số",
-	"not_exist": ":fieldname không tồn tại"
+	"not_exist": ":fieldname không tồn tại",
+  "not_editable": ":fieldname không được chỉnh sửa"
 }
