@@ -53,6 +53,12 @@ export default class UsersRouter extends BaseRouter {
       this.controller.updateById.bind(this.controller)
     );
 
+    this.router.delete(
+      this.path("/:userId/delete"),
+      middleware("user.delete"),
+      this.controller.deleteById.bind(this.controller)
+    );
+
     this.router.put(
       this.path("/"),
       middleware("user.update"),
@@ -60,6 +66,7 @@ export default class UsersRouter extends BaseRouter {
       formValidate(this.validator.update()),
       this.controller.update.bind(this.controller)
     );
+   
     this.router.post(
       this.path("/:userId/lock"),
       this.controller.lock.bind(this.controller)

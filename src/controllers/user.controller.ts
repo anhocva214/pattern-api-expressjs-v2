@@ -94,6 +94,17 @@ export default class UserController {
     }
   }
 
+  async deleteById(req: Request, res: Response, next: NextFunction){
+    try{
+      let userId = req.params.userId?.toString() || "";
+      await this.userService.deleteById(userId)
+      return res.json({})
+    }
+    catch (err) {
+      next(err);
+    }
+  }
+
   // update info
   async update(req: Request, res: Response) {
     let user = new User(req.user);
