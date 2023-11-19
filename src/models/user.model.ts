@@ -2,7 +2,8 @@ import { Schema, model } from "mongoose";
 import BaseModel from ".";
 import moment from "moment";
 
-
+export const UserListGenders = ["male", "female", "other"] as const
+export type TUserGender = typeof UserListGenders[number]
 
 export class User extends BaseModel {
   avatarURL: string;
@@ -14,12 +15,12 @@ export class User extends BaseModel {
   balance: number;
   locked: boolean;
   fullnameSlug?: string;
-  birthday: Date | null
-  gender: string
+  birthday: Date | null;
+  gender: TUserGender;
 
   constructor(obj?: Partial<User>) {
     super(obj as any);
-    this.avatarURL = obj?.avatarURL || ""
+    this.avatarURL = obj?.avatarURL || "";
     this.email = obj?.email || "";
     this.phoneNumber = obj?.phoneNumber || "";
     this.password = obj?.password || "";
@@ -28,14 +29,14 @@ export class User extends BaseModel {
     this.balance = obj?.balance || 0;
     this.locked = obj?.locked || false;
     this.fullnameSlug = obj?.fullnameSlug || "";
-    this.birthday = obj?.birthday || null
-    this.gender = obj?.gender || ""
+    this.birthday = obj?.birthday || null;
+    this.gender = obj?.gender || "other";
   }
 
   toDataResponse(): IUserResponse {
     return {
       ...this,
-      password: undefined
+      password: undefined,
     };
   }
 
@@ -46,13 +47,15 @@ export class User extends BaseModel {
       phoneNumber: this.phoneNumber,
       fullname: this.fullname,
       birthday: moment(new Date(this.birthday as any)).format("DD/MM/YYYY"),
-    } 
+    };
   }
 }
 
-interface IUserResponse extends Omit<User, "password" | "preCreate" | "preUpdate" | "toDataResponse">{
-
-}
+interface IUserResponse
+  extends Omit<
+    User,
+    "password" | "preCreate" | "preUpdate" | "toDataResponse"
+  > {}
 
 const userSchema = new Schema({
   avatarURL: String,
@@ -67,7 +70,7 @@ const userSchema = new Schema({
   locked: Boolean,
   fullnameSlug: String,
   birthday: Date,
-  gender: String
+  gender: String,
 });
 
 userSchema.set("toObject", {

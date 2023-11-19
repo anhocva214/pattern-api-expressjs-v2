@@ -17,7 +17,7 @@ export default class AuthValidator {
           if (!existing) {
             throw new Error(MESSAGE_TYPE.not_exist);
           }
-        }),,
+        }),
       check("username").not().isEmpty().withMessage(MESSAGE_TYPE.required),
       check("password").not().isEmpty().withMessage(MESSAGE_TYPE.required),
     ];

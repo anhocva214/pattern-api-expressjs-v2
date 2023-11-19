@@ -1,5 +1,5 @@
 import { FileUpload } from "@models/upload.model";
-import { User, UserModel } from "@models/user.model";
+import { TUserGender, User, UserModel } from "@models/user.model";
 import CloudinaryService from "@services/cloudinary.service";
 import _ from "lodash";
 import bcrypt from "bcrypt";
@@ -31,11 +31,31 @@ export default class UserService {
     password: string;
     keyCreate: string;
   }) {
-    let user = new User(await UserModel.findOne({email: data.email}) as any);
+    let user = new User(
+      (await UserModel.findOne({ email: data.email })) as any
+    );
     user.password = await bcrypt.hash(user.password, await bcrypt.genSalt());
     user.preUpdate();
-    await UserModel.updateOne({_id: user.id}, user)
-    return new User(await UserModel.findOne({email: data.email}) as any).toDataResponse();
+    await UserModel.updateOne({ _id: user.id }, user);
+    return new User(
+      (await UserModel.findOne({ email: data.email })) as any
+    ).toDataResponse();
+  }
+
+  async create(data: {
+    fullname: string;
+    email: string;
+    password: string;
+    phoneNumber: string;
+    birthday: Date;
+    gender: TUserGender;
+    role: string;
+  }) {
+    let user = new User(data);
+    user.password = await bcrypt.hash(user.password, await bcrypt.genSalt());
+    user.preCreate();
+    let newUser = new User((await UserModel.create(user)) as any);
+    return newUser.toDataResponse();
   }
 
   async update(

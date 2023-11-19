@@ -10,15 +10,7 @@ export const USER_PERMISSIONS = [
   "user.delete",
 ] as const;
 
-export const ADMIN_PERMISSIONS = [
-  "admin.get_detail",
-  "admin.get_list",
-] as const;
-
 export const SUPER_ADMIN_PERMISSIONS = [
-  "admin.create",
-  "admin.update",
-  "admin.delete",
   "role.create",
   "role.update",
   "role.get_list",
@@ -33,7 +25,6 @@ export const SUPER_ADMIN_PERMISSIONS = [
 
 export const ALL_PERMISSIONS = [
   ...USER_PERMISSIONS,
-  ...ADMIN_PERMISSIONS,
   ...SUPER_ADMIN_PERMISSIONS,
 ];
 

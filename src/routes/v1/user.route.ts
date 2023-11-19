@@ -39,6 +39,13 @@ export default class UsersRouter extends BaseRouter {
       this.controller.updatePasswordSuperAdmin.bind(this.controller)
     );
 
+    this.router.post(
+      this.path("/create"),
+      middleware("user.create"),
+      formValidate(this.validator.create()),
+      this.controller.create.bind(this.controller)
+    );
+
     this.router.put(
       this.path("/"),
       middleware("user.update"),
