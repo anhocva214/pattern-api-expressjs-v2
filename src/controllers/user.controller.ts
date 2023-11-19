@@ -53,12 +53,43 @@ export default class UserController {
     }
   }
 
-  async create(req: Request, res: Response, next: NextFunction){
-    try{
-      let data = await this.userService.create(req.body)
+  async create(req: Request, res: Response, next: NextFunction) {
+    try {
+      let { fullname, email, password, phoneNumber, birthday, gender, role } =
+        req.body;
+      let data = await this.userService.create({
+        fullname,
+        email,
+        password,
+        phoneNumber,
+        birthday,
+        gender,
+        role,
+      });
       return res.json(data);
+    } catch (err) {
+      next(err);
     }
-    catch (err){
+  }
+
+  async updateById(req: Request, res: Response, next: NextFunction) {
+    try {
+      let userId = req.params.userId?.toString() || "";
+      let avatarFile = new FileUpload(req.file as any);
+      let { fullname, email, password, phoneNumber, birthday, gender, role } =
+        req.body;
+      let data = await this.userService.updateById(userId, {
+        avatarFile,
+        fullname,
+        email,
+        password,
+        phoneNumber,
+        birthday,
+        gender,
+        role,
+      });
+      return res.json(data);
+    } catch (err) {
       next(err);
     }
   }

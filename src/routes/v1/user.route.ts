@@ -47,6 +47,13 @@ export default class UsersRouter extends BaseRouter {
     );
 
     this.router.put(
+      this.path("/:userId/update"),
+      middleware("user.update"),
+      formValidate(this.validator.update()),
+      this.controller.updateById.bind(this.controller)
+    );
+
+    this.router.put(
       this.path("/"),
       middleware("user.update"),
       this.uploadService.instance().single("avatarFile"),
