@@ -1,7 +1,7 @@
 import {
   ALL_PERMISSIONS,
-  USER_PERMISSIONS,
-  SUPER_ADMIN_PERMISSIONS,
+  PERMISSIONS_NOT_ASSIGN,
+  PERMISSIONS_OF_USER,
 } from "@helpers/access-control.helper";
 import { AppError } from "@models/error";
 import Role, { RoleModel, TUserPermission } from "@models/role.model";
@@ -11,7 +11,7 @@ import logger from "../logger.service";
 
 export default class AccessControlService {
   private allPermissions = ALL_PERMISSIONS;
-  private userPermission = USER_PERMISSIONS;
+  private userPermission = PERMISSIONS_OF_USER;
 
   constructor() {}
 
@@ -126,6 +126,6 @@ export default class AccessControlService {
   }
 
   getAllPermissions() {
-    return _.difference(this.allPermissions, [...SUPER_ADMIN_PERMISSIONS]);
+    return _.difference(this.allPermissions, [...PERMISSIONS_NOT_ASSIGN]);
   }
 }

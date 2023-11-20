@@ -48,14 +48,14 @@ export default class UsersRouter extends BaseRouter {
 
     this.router.put(
       this.path("/:userId/update"),
-      middleware("user.update"),
+      middleware("user.update_by_id"),
       formValidate(this.validator.update()),
       this.controller.updateById.bind(this.controller)
     );
 
     this.router.delete(
       this.path("/:userId/delete"),
-      middleware("user.delete"),
+      middleware("user.delete_by_id"),
       this.controller.deleteById.bind(this.controller)
     );
 
