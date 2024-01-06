@@ -49,7 +49,7 @@ export default function middleware(permission?: TUserPermission) {
         return res.status(403).send({ message: "Tài khoản đã bị khoá" });
       }
 
-      if (!!permission && !accessControlService.can(user.role, permission)) {
+      if (!!permission && !(await accessControlService.can(user.role, permission))) {
         return res
           .status(403)
           .json({ message: "Bạn không có quyền" });
